@@ -162,8 +162,9 @@ export default class CardService {
                     card.style.justifyContent = 'center';
                 } else {
                     let cardIdx = (this.offset + (i * ROW_LIMIT + j) - adCount) % this.currentCards.length;
-                    card.style.backgroundImage = `url(${this.currentCards[cardIdx].imgSrc})`;
-                    card.style.backgroundSize = 'cover';
+                    let cardImg = document.createElement('img');
+                    cardImg.src = this.currentCards[cardIdx].imgSrc;
+                    card.appendChild(cardImg);
                 }
                 row.appendChild(card);
             }

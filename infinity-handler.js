@@ -15,7 +15,7 @@ async function setup() {
         if(!cardService.loading) {
             // grab data set 
             var sets = document.querySelectorAll('div[data-triggered]');
-            var target = sets[sets.length-1];
+            var target = sets[sets.length-2];
 
             // window.scrollY is not supported by IE
             var windowHeight = document.documentElement.scrollTop+ window.innerHeight, targetPlacement = target.offsetHeight + target.offsetTop;
