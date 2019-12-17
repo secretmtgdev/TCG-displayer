@@ -1,7 +1,7 @@
 import Card from '../classes/Card.js';
 
-const ROW_LIMIT = 4;
-const QUERY_LIMIT = 14;
+const COL_LIMIT = 4;
+const QUERY_LIMIT = 100;
 
 export default class CardService {
     constructor() {
@@ -86,7 +86,7 @@ export default class CardService {
         request.overrideMimeType('application/json');
         request.open('GET', './config.json');
         request.onreadystatechange = function() {
-            if(request.readyState === ROW_LIMIT && request.status === 200) {
+            if(request.readyState === COL_LIMIT && request.status === 200) {
                 this.json = JSON.parse(request.responseText)['api'];
                 this.setAuth('TCGPlayer', response => {
                     this.authToken = JSON.parse(response)['access_token'];
@@ -142,17 +142,17 @@ export default class CardService {
     }
 
     showCaseCards() {
-        var firstRandCol = Math.floor(Math.random()*3), secondRandCol = Math.floor(Math.random()*3);
         var adCount = 0;
-        for(var i = 0; i < ROW_LIMIT; i++) {
+        for(var i = 0; i < QUERY_LIMIT/COL_LIMIT; i++) {
             var row = document.createElement('section');
+            var randAdCol = Math.floor(Math.random()*COL_LIMIT);
             row.className = 'wrapper';
-            for(var j = 0; j < ROW_LIMIT; j++) {
+            for(var j = 0; j < COL_LIMIT; j++) {
                 var card = document.createElement('div');
                 card.className = 'card';
 
                 // set trigger
-                if((i === 1 && j ===firstRandCol)||(i===3&&j===secondRandCol)) {
+                if(i%2===1 && j === randAdCol) {
                     card.dataset.triggered=false;
                     card.dataset.id= this.currTrigger++;
                     adCount++;
@@ -161,9 +161,11 @@ export default class CardService {
                     card.style.alignItems = 'center';
                     card.style.justifyContent = 'center';
                 } else {
-                    let cardIdx = (this.offset + (i * ROW_LIMIT + j) - adCount) % this.currentCards.length;
+                    let cardIdx = (this.offset + (i * COL_LIMIT + j) - adCount) % this.currentCards.length;
                     let cardImg = document.createElement('img');
-                    cardImg.src = this.currentCards[cardIdx].imgSrc;
+                    cardImg.src = './assets/placeholder.jpg';
+                    cardImg.className = 'lazy';
+                    cardImg.dataset.src = this.currentCards[cardIdx].imgSrc;
                     card.appendChild(cardImg);
                 }
                 row.appendChild(card);
@@ -171,5 +173,26 @@ export default class CardService {
             infinity.appendChild(row)
         }
         this.loading = false;
+        this.lazyLoadHandler();
+    }
+
+    // Portion taken from following  Jeremy Wagner's lazy loading article
+    lazyLoadHandler() {
+        var lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
+        console.log(lazyImages);
+        let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(function(entry) {
+                if(entry.isIntersecting) {
+                    let lazyImage = entry.target;
+                    lazyImage.src = lazyImage.dataset.src;
+                    lazyImage.classList.remove('lazy');
+                    lazyImageObserver.unobserve(lazyImage);
+                }
+            });
+        });
+        
+        lazyImages.forEach(function(lazyImage) {
+            lazyImageObserver.observe(lazyImage);
+        })
     }
 }

@@ -1,4 +1,3 @@
-import Card from './classes/Card.js';
 import CardService from './services/CardService.js';
 
 const cardService = new CardService();
@@ -11,6 +10,20 @@ if(document.readyState === 'loading') {
 }
 
 async function setup() {
+    let token = sessionStorage.getItem('position');
+    if(token) {
+        let {x, y} = JSON.parse(token);
+        console.log(x)
+        console.log(y)
+        window.scrollTo(x, y);
+    }
+    window.addEventListener('beforeunload', () => {
+        let pos = {
+            x: window.pageXOffset,
+            y: window.pageYOffset
+        }
+        sessionStorage.setItem('position', JSON.stringify(pos));
+    })
     window.addEventListener('scroll',  async function() {
         if(!cardService.loading) {
             // grab data set 
@@ -20,7 +33,6 @@ async function setup() {
             // window.scrollY is not supported by IE
             var windowHeight = document.documentElement.scrollTop+ window.innerHeight, targetPlacement = target.offsetHeight + target.offsetTop;
             if(windowHeight > targetPlacement) {
-                console.log(cardService.offset);
                 cardService.loading = true;
                 await cardService.loadJSON();
             }
