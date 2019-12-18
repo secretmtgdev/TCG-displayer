@@ -2,6 +2,9 @@ import Card from '../classes/Card.js';
 
 const COL_LIMIT = 4;
 const QUERY_LIMIT = 100;
+var CARD_LIMIT;
+var ROW_CACHE = [];
+var rowRef = 1;
 
 export default class CardService {
     constructor() {
@@ -27,6 +30,7 @@ export default class CardService {
     async setAuth(gameType, cb) {
         this.type = gameType;
         if(this.json && this.json[gameType]) this.scope = this.json[gameType];
+        CARD_LIMIT = this.scope['set'].throne_of_eldraine.end;
         let request = new XMLHttpRequest();
 
         // request the key
@@ -109,9 +113,15 @@ export default class CardService {
                 this.currentCards.push(new Card(card.name, card.productId, card.groupId, card.imageUrl));
             }
             this.showCaseCards();
-            this.offset += QUERY_LIMIT;
         }
-        await this.restCall("GET", "products", handler, "categoryId=1", `limit=${QUERY_LIMIT}`, `offset=${this.offset+this.scope['set'].throne_of_eldraine.start}`);
+        let start = this.offset+this.scope['set'].throne_of_eldraine.start;
+        if(start < CARD_LIMIT - QUERY_LIMIT) {
+            await this.restCall("GET", "products", handler, "categoryId=1", `limit=${QUERY_LIMIT}`, `offset=${this.offset+this.scope['set'].throne_of_eldraine.start}`);
+        } else {
+            console.log('DONE CACHING NODES');
+            console.log(ROW_CACHE)
+            //this.showCaseCards();
+        }
     }
 
     /**
@@ -133,9 +143,7 @@ export default class CardService {
         });
 
         let queries=query.join("&");
-
         let url = `${this.proxyurl}${this.scope['base']}${this.scope['endpoints'][endpoint]}${query.length>0?`?${queries}`:''}`
-        console.log(url);
         xhr.open(method, url);
         xhr.setRequestHeader('Authorization', `Bearer ${this.authToken}`);
         xhr.send(data);
@@ -147,6 +155,7 @@ export default class CardService {
             var row = document.createElement('section');
             var randAdCol = Math.floor(Math.random()*COL_LIMIT);
             row.className = 'wrapper';
+            row.dataset.rowRef = rowRef;
             for(var j = 0; j < COL_LIMIT; j++) {
                 var card = document.createElement('div');
                 card.className = 'card';
@@ -169,17 +178,18 @@ export default class CardService {
                     card.appendChild(cardImg);
                 }
                 row.appendChild(card);
+                ROW_CACHE.push(row.cloneNode(true));
             }
             infinity.appendChild(row)
         }
         this.loading = false;
+        this.offset += QUERY_LIMIT;
         this.lazyLoadHandler();
     }
 
     // Portion taken from following  Jeremy Wagner's lazy loading article
     lazyLoadHandler() {
         var lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
-        console.log(lazyImages);
         let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
             entries.forEach(function(entry) {
                 if(entry.isIntersecting) {
