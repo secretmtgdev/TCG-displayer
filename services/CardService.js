@@ -1,5 +1,5 @@
 import Card from '../classes/Card.js';
-import Util from '../classes/Util.js';
+import Util from './Util.js/index.js';
 
 const COL_LIMIT = 4;
 var ROW_CACHE = [];

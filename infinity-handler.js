@@ -1,5 +1,5 @@
 import CardService from './services/CardService.js';
-import Util from './classes/Util.js';
+import Util from './services/Util.js/index.js';
 
 const cardService = new CardService();
 
