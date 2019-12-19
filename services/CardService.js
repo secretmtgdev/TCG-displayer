@@ -2,7 +2,6 @@ import Card from '../classes/Card.js';
 import Util from './Util.js';
 
 const COL_LIMIT = 4;
-var ROW_CACHE = [];
 var rowRef = 1;
 
 export default class CardService {
@@ -11,9 +10,6 @@ export default class CardService {
         this.currentCards = [];
         this.currTrigger = 1;
         this.loading = false;
-
-        // get around CORs issue with TCGPlayer api
-        this.proxyurl = "";
     }
 
     /**
@@ -88,7 +84,6 @@ export default class CardService {
                     card.appendChild(cardImg);
                 }
                 row.appendChild(card);
-                ROW_CACHE.push(row.cloneNode(true));
             }
             infinityScroll.appendChild(row)
         }

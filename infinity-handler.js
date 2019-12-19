@@ -24,7 +24,7 @@ function setup() {
         }
     })
     
-    window.addEventListener('scroll',  async function(callback) {
+    window.addEventListener('scroll', function(callback) {
         if(!cardService.loading) {
             // grab data set 
             var sets = document.querySelectorAll('div[data-triggered]');
