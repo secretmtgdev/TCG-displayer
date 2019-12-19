@@ -1,5 +1,5 @@
 import Card from '../classes/Card.js';
-import Util from './Util.js/index.js';
+import Util from './Util.js';
 
 const COL_LIMIT = 4;
 var ROW_CACHE = [];
@@ -43,6 +43,7 @@ export default class CardService {
             let results = JSON.parse(response)['results'];
             for(let key in results) {
                 let card = results[key];
+                console.log(card);
                 this.currentCards.push(new Card(card.name, card.productId, card.groupId, card.imageUrl));
             }
             this.showCaseCards(callback);
