@@ -1,7 +1,7 @@
 import CardService from './services/CardService.js';
+import Util from './classes/Util.js';
 
 const cardService = new CardService();
-var currTrigger = 1;
 
 if(document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', setup);
@@ -9,22 +9,22 @@ if(document.readyState === 'loading') {
     setup();
 }
 
-async function setup() {
-    let token = sessionStorage.getItem('position');
-    if(token) {
-        let {x, y} = JSON.parse(token);
-        console.log(x)
-        console.log(y)
-        window.scrollTo(x, y);
-    }
+function setup() {
     window.addEventListener('beforeunload', () => {
         let pos = {
             x: window.pageXOffset,
             y: window.pageYOffset
         }
+    
         sessionStorage.setItem('position', JSON.stringify(pos));
+        if(infinityScroll.childNodes.length > 0) {
+            sessionStorage.setItem('cached-query', JSON.stringify({
+                cards: cardService.currentCards
+            }));
+        }
     })
-    window.addEventListener('scroll',  async function() {
+    
+    window.addEventListener('scroll',  async function(callback) {
         if(!cardService.loading) {
             // grab data set 
             var sets = document.querySelectorAll('div[data-triggered]');
@@ -34,9 +34,10 @@ async function setup() {
             var windowHeight = document.documentElement.scrollTop+ window.innerHeight, targetPlacement = target.offsetHeight + target.offsetTop;
             if(windowHeight > targetPlacement) {
                 cardService.loading = true;
-                await cardService.loadJSON();
+                cardService.loadJSON(callback);
             }
         }
-    });
-    await cardService.loadJSON();
+    }.bind(this, Util.scrollHandler));
+
+    cardService.loadJSON(Util.scrollHandler); 
 }
