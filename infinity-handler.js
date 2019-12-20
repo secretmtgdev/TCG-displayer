@@ -16,15 +16,15 @@ function setup() {
             y: window.pageYOffset
         }
     
-        sessionStorage.setItem('position', JSON.stringify(pos));
+        localStorage.setItem('position', JSON.stringify(pos));
         if(infinityScroll.childNodes.length > 0) {
-            sessionStorage.setItem('cached-query', JSON.stringify({
+            localStorage.setItem('cached-query', JSON.stringify({
                 cards: cardService.currentCards
             }));
         }
     })
     
-    window.addEventListener('scroll', function(callback) {
+    window.addEventListener('scroll', function() {
         if(!cardService.loading) {
             // grab data set 
             var sets = document.querySelectorAll('div[data-triggered]');
@@ -34,9 +34,9 @@ function setup() {
             var windowHeight = document.documentElement.scrollTop+ window.innerHeight, targetPlacement = target.offsetHeight + target.offsetTop;
             if(windowHeight > targetPlacement) {
                 cardService.loading = true;
-                cardService.loadJSON(callback);
+                cardService.getProducts();
             }
         }
-    }.bind(this, Util.scrollHandler));
-    cardService.loadJSON(Util.scrollHandler); 
+    }.bind(this));
+    cardService.loadJSON(); 
 }

@@ -15,16 +15,15 @@ export default class CardService {
     /**
      * @method loadJSON 
      * @description Loads the local config.json file
-     * @param {Function} The callback function to handle the get request
      */
-    loadJSON(cb) {
+    loadJSON() {
         Util.loadJSON().then(function(response) {
-            let cached = sessionStorage.getItem('cached-query');
+            let cached = localStorage.getItem('cached-query');
             if(cached) {
                 this.currentCards = JSON.parse(cached)['cards'];
                 this.showCaseCards(Util.scrollHandler);                        
             } else {
-                this.getProducts(cb);
+                this.getProducts();
             }
         }.bind(this))
     }
@@ -32,16 +31,15 @@ export default class CardService {
     /**
      * @method getProducts
      * @description Makes a call to the product endpoint API of the respective source
-     * @param {Function} callback
      */
-    getProducts(callback) {
+    getProducts() {
         let handler = response => {
             let results = JSON.parse(response)['results'];
             for(let key in results) {
                 let card = results[key];
                 this.currentCards.push(new Card(card.name, card.productId, card.groupId, card.imageUrl));
             }
-            this.showCaseCards(callback);
+            this.showCaseCards();
         }
         let start = this.offset+Util.scope['set'].throne_of_eldraine.start;
         if(start < Util.CARD_LIMIT - Util.QUERY_LIMIT) {
@@ -89,6 +87,10 @@ export default class CardService {
         this.loading = false;
         this.offset += Util.QUERY_LIMIT;
         Util.lazyLoadHandler();
-        callback();
+        if(typeof(callback) === 'function') 
+        {   
+            console.log(callback)
+            callback();
+        }
     }
 }

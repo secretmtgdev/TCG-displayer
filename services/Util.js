@@ -1,6 +1,6 @@
 export default class Util {
     static scrollHandler() {
-        let token = sessionStorage.getItem('position');
+        let token = localStorage.getItem('position');
         if(token) {
             let {x, y} = JSON.parse(token);
             window.scrollTo(x, y);
@@ -10,14 +10,13 @@ export default class Util {
     /**
      * @method loadJSON 
      * @description Loads the local config.json file
-     * @param {Function} The callback function to handle the get request
      */
     static loadJSON() {
         return new Promise(function(resolve, reject) {
             let request = new XMLHttpRequest();
             request.overrideMimeType('application/json');
             request.open('GET', './config.json');
-            request.onreadystatechange = function(cb) {
+            request.onreadystatechange = function() {
                 if(request.readyState === 4 && request.status === 200) {
                     Util.json = JSON.parse(request.responseText)['api'];
                     Util.setAuth('TCGPlayer', response => {
