@@ -38,6 +38,5 @@ function setup() {
             }
         }
     }.bind(this, Util.scrollHandler));
-
     cardService.loadJSON(Util.scrollHandler); 
 }

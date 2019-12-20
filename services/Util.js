@@ -1,11 +1,4 @@
 export default class Util {
-    static QUERY_LIMIT = 100;
-    CARD_LIMIT;
-    authToken = '';
-    json = '';
-    type = '';
-    scope = '';
-    proxyUrl = '';
     static scrollHandler() {
         let token = sessionStorage.getItem('position');
         if(token) {
@@ -46,7 +39,7 @@ export default class Util {
     static setAuth(gameType, cb) {
         Util.type = gameType;
         if(Util.json && Util.json[gameType]) Util.scope = Util.json[gameType];
-        
+        Util.QUERY_LIMIT = 100;
         Util.CARD_LIMIT = Util.scope['set'].throne_of_eldraine.end;
         let request = new XMLHttpRequest();
 

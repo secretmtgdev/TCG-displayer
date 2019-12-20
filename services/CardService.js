@@ -39,7 +39,6 @@ export default class CardService {
             let results = JSON.parse(response)['results'];
             for(let key in results) {
                 let card = results[key];
-                console.log(card);
                 this.currentCards.push(new Card(card.name, card.productId, card.groupId, card.imageUrl));
             }
             this.showCaseCards(callback);
