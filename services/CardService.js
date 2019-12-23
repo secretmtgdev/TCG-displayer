@@ -89,7 +89,6 @@ export default class CardService {
         Util.lazyLoadHandler();
         if(typeof(callback) === 'function') 
         {   
-            console.log(callback)
             callback();
         }
     }
