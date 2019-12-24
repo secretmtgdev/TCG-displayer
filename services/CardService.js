@@ -20,8 +20,11 @@ export default class CardService {
         Util.loadJSON().then(function(response) {
             let cached = localStorage.getItem('cached-query');
             if(cached) {
-                this.currentCards = JSON.parse(cached)['cards'];
+                let parsed = JSON.parse(cached);
+                this.currentCards =  parsed['cards'];
+                this.offset = 0;
                 this.showCaseCards(Util.scrollHandler);                        
+                this.offset = parsed['offset'];
             } else {
                 this.getProducts();
             }
@@ -32,7 +35,7 @@ export default class CardService {
      * @method getProducts
      * @description Makes a call to the product endpoint API of the respective source
      */
-    getProducts() {
+    async getProducts() {
         let handler = response => {
             let results = JSON.parse(response)['results'];
             for(let key in results) {
@@ -43,7 +46,7 @@ export default class CardService {
         }
         let start = this.offset+Util.scope['set'].throne_of_eldraine.start;
         if(start < Util.CARD_LIMIT - Util.QUERY_LIMIT) {
-            Util.restCall("GET", "products", handler, "categoryId=1", `limit=${Util.QUERY_LIMIT}`, `offset=${start}`);
+            await Util.restCall("GET", "products", handler, "categoryId=1", `limit=${Util.QUERY_LIMIT}`, `offset=${start}`);
         }
     }
 
@@ -54,7 +57,7 @@ export default class CardService {
      */
     showCaseCards(callback) {
         var adCount = 0;
-        for(var i = 0; i < Util.QUERY_LIMIT/COL_LIMIT; i++) {
+        for(var i = 0; i < this.currentCards.length/COL_LIMIT; i++) {
             var row = document.createElement('section');
             var randAdCol = Math.floor(Math.random()*COL_LIMIT);
             row.className = 'wrapper';
@@ -76,7 +79,7 @@ export default class CardService {
                     let cardIdx = (this.offset + (i * COL_LIMIT + j) - adCount) % this.currentCards.length;
                     let cardImg = document.createElement('img');
                     cardImg.src = './assets/placeholder.jpg';
-                    cardImg.className = 'lazy';
+                    cardImg.classList.add('lazy');
                     cardImg.dataset.src = this.currentCards[cardIdx]._imgSrc;
                     card.appendChild(cardImg);
                 }

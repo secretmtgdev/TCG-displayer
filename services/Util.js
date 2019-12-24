@@ -39,6 +39,7 @@ export default class Util {
         Util.type = gameType;
         if(Util.json && Util.json[gameType]) Util.scope = Util.json[gameType];
         Util.QUERY_LIMIT = 100;
+        Util.START = Util.scope['set'].throne_of_eldraine.start;
         Util.CARD_LIMIT = Util.scope['set'].throne_of_eldraine.end;
         let request = new XMLHttpRequest();
 

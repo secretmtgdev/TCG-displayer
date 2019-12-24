@@ -18,13 +18,15 @@ function setup() {
     
         localStorage.setItem('position', JSON.stringify(pos));
         if(infinityScroll.childNodes.length > 0) {
+            let invalidOffset = cardService.offset > Util.CARD_LIMIT - Util.START;
             localStorage.setItem('cached-query', JSON.stringify({
-                cards: cardService.currentCards
+                cards: invalidOffset ? [] : cardService.currentCards, 
+                offset: invalidOffset ? 0 : cardService.offset
             }));
         }
     })
     
-    window.addEventListener('scroll', function() {
+    window.addEventListener('scroll', async function() {
         if(!cardService.loading) {
             // grab data set 
             var sets = document.querySelectorAll('div[data-triggered]');
@@ -34,7 +36,7 @@ function setup() {
             var windowHeight = document.documentElement.scrollTop+ window.innerHeight, targetPlacement = target.offsetHeight + target.offsetTop;
             if(windowHeight > targetPlacement) {
                 cardService.loading = true;
-                cardService.getProducts();
+                await cardService.getProducts();
             }
         }
     }.bind(this));
